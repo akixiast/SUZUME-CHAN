@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>suzume · Daily Anime Draw Challenge</title>
+  <meta name="description" content="A tiny daily anime draw challenge — digital or on paper.">
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <span class="brand-mark">s</span>
+        <div>
+          <p class="brand-name">suzume</p>
+          <p class="brand-sub">daily anime draw challenge</p>
+        </div>
+      </div>
+      <nav class="nav" id="nav">
+        <button class="nav-btn is-active" data-section="today">Today</button>
+        <button class="nav-btn" data-section="draw">Draw</button>
+        <button class="nav-btn" data-section="gallery">Gallery</button>
+        <button class="nav-btn" data-section="explore">Explore</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- ============ TODAY ============ -->
+    <section class="section is-active" id="today">
+      <div class="hero">
+        <p class="eyebrow"><span class="dot"></span> Today's prompt · <span id="today-date"></span></p>
+        <h1 id="prompt-title">Loading…</h1>
+        <p class="hero-desc" id="prompt-description"></p>
+        <div class="meta-row">
+          <span class="pill" id="prompt-difficulty">—</span>
+          <span class="pill pill-muted" id="prompt-time">—</span>
+        </div>
+
+        <div class="ref-card" id="prompt-ref" hidden>
+          <img id="prompt-ref-img" alt="">
+          <div class="ref-info">
+            <p class="mono-label">REFERENCE INSPO</p>
+            <p class="ref-title" id="prompt-ref-title"></p>
+            <a class="ref-link" id="prompt-ref-link" target="_blank" rel="noopener">View on AniList →</a>
+          </div>
+        </div>
+
+        <div class="hero-actions">
+          <button class="btn btn-primary" id="start-digital-btn">Draw digital</button>
+          <button class="btn btn-ghost" id="start-paper-btn">Draw on paper</button>
+        </div>
+        <p class="hero-note">Digital = draw on the canvas here. Paper = sketch in your notebook, then upload a photo.</p>
+      </div>
+
+      <div class="how-grid">
+        <div class="how-card"><p class="how-num">01</p><h3>Pick a mode</h3><p>Digital canvas or paper upload. Same prompt, same timer.</p></div>
+        <div class="how-card"><p class="how-num">02</p><h3>Beat the timer</h3><p>15, 30 or 60 minutes. Constraints make it fun.</p></div>
+        <div class="how-card"><p class="how-num">03</p><h3>Keep the streak</h3><p>Submit daily to grow your gallery and streak.</p></div>
+      </div>
+    </section>
+
+    <!-- ============ DRAW ============ -->
+    <section class="section" id="draw">
+      <div class="panel">
+        <div class="panel-head">
+          <div>
+            <h2>Draw</h2>
+            <p class="panel-sub" id="draw-prompt-note"></p>
+          </div>
+          <span class="timer" id="timer-display">30:00</span>
+        </div>
+
+        <!-- mode toggle -->
+        <div class="mode-toggle" role="tablist" aria-label="Drawing mode">
+          <button class="mode-btn is-active" id="mode-digital-btn" type="button">Digital canvas</button>
+          <button class="mode-btn" id="mode-paper-btn" type="button">Paper upload</button>
+        </div>
+
+        <!-- DIGITAL PANE -->
+        <div id="digital-pane">
+          <div class="toolbar">
+            <div class="tool-group">
+              <span class="mono-label">Tool</span>
+              <div class="btn-row">
+                <button class="tool-btn is-active" id="pen-btn" type="button">Pen</button>
+                <button class="tool-btn" id="eraser-btn" type="button">Eraser</button>
+              </div>
+            </div>
+            <div class="tool-group">
+              <label class="mono-label" for="color-input">Color</label>
+              <input type="color" id="color-input" value="#f7f8f8">
+            </div>
+            <div class="tool-group">
+              <label class="mono-label" for="size-input">Size</label>
+              <select id="size-input">
+                <option value="2">Fine</option>
+                <option value="8" selected>Medium</option>
+                <option value="20">Bold</option>
+              </select>
+            </div>
+            <div class="tool-group">
+              <span class="mono-label">Actions</span>
+              <div class="btn-row">
+                <button class="tool-btn" id="undo-btn" type="button">Undo</button>
+                <button class="tool-btn" id="clear-btn" type="button">Clear</button>
+              </div>
+            </div>
+          </div>
+          <div class="canvas-wrap">
+            <canvas id="canvas" width="800" height="600"></canvas>
+          </div>
+        </div>
+
+        <!-- PAPER PANE -->
+        <div id="paper-pane" hidden>
+          <label class="dropzone" id="dropzone">
+            <input type="file" id="photo-input" accept="image/*" hidden>
+            <div class="drop-inner" id="drop-empty">
+              <p class="drop-icon">↓</p>
+              <p class="drop-title">Drop your paper photo here, or click to browse</p>
+              <p class="drop-sub">JPG / PNG from your sketchbook — we preview it below</p>
+            </div>
+            <img id="paper-preview" alt="Paper drawing preview" hidden>
+          </label>
+          <div class="paper-row">
+            <button class="tool-btn" id="paper-change-btn" type="button">Choose another photo</button>
+            <button class="tool-btn" id="paper-remove-btn" type="button">Remove</button>
+          </div>
+          <div class="paper-tips">
+            <p><strong>Tip</strong> — shoot top-down in daylight, fill the frame with the drawing.</p>
+          </div>
+        </div>
+
+        <div class="timer-bar">
+          <label class="mono-label" for="duration-input">Timer</label>
+          <select id="duration-input">
+            <option value="15">15 min</option>
+            <option value="30" selected>30 min</option>
+            <option value="60">60 min</option>
+          </select>
+          <div class="btn-row">
+            <button class="tool-btn" id="timer-start-btn" type="button">Start</button>
+            <button class="tool-btn" id="timer-pause-btn" type="button">Pause</button>
+            <button class="tool-btn" id="timer-reset-btn" type="button">Reset</button>
+          </div>
+        </div>
+
+        <button class="btn btn-primary btn-big" id="submit-btn">Submit to gallery</button>
+        <p class="hint" id="submit-hint" hidden></p>
+      </div>
+    </section>
+
+    <!-- ============ GALLERY ============ -->
+    <section class="section" id="gallery">
+      <div class="panel-head">
+        <h2>Gallery</h2>
+        <div class="streak">
+          <span class="streak-flame">●</span>
+          <span class="streak-count" id="streak-count">0</span>
+          <span class="streak-label">day streak</span>
+        </div>
+      </div>
+      <div class="gallery-grid" id="gallery-grid"></div>
+      <p class="empty-msg" id="gallery-empty" hidden>Nothing here yet — go draw today's prompt.</p>
+    </section>
+
+    <!-- ============ EXPLORE ============ -->
+    <section class="section" id="explore">
+      <div class="panel">
+        <div class="panel-head">
+          <div>
+            <h2>Trending on AniList</h2>
+            <p class="panel-sub">Live inspo. Tap one to draw it.</p>
+          </div>
+          <button class="tool-btn" id="explore-refresh" type="button">Refresh</button>
+        </div>
+        <div class="explore-grid" id="explore-grid"></div>
+        <p class="empty-msg" id="explore-status">Loading trending anime…</p>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <p>Anime data from <a href="https://anilist.co" target="_blank" rel="noopener">AniList</a>. Fan project.</p>
+  </footer>
+
+  <script src="anilist.js"></script>
+  <script src="prompts.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
