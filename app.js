@@ -9,12 +9,12 @@ const $ = (id) => document.getElementById(id);
 /* ---------------- theme (light / dark + accent) ---------------- */
 
 const THEME_ACCENTS = {
-  indigo: "Indigo",
-  teal: "Teal",
-  vermilion: "Vermilion",
-  amber: "Amber",
-  rose: "Rose",
-  violet: "Violet",
+  periwinkle: "Periwinkle",
+  mint: "Mint",
+  blush: "Blush",
+  butter: "Butter",
+  lilac: "Lilac",
+  sky: "Sky",
 };
 
 const root = document.documentElement;

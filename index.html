@@ -10,11 +10,11 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600;700;800&family=Rubik+Mono+One&display=swap" rel="stylesheet">
   <script>
-    /* apply saved theme before first paint to avoid a flash */
+    /* apply saved theme before first paint to avoid a flash (dark by default) */
     (function () {
-      var ACCENTS = ["indigo", "teal", "vermilion", "amber", "rose", "violet"];
-      var mode = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-      var accent = "indigo";
+      var ACCENTS = ["periwinkle", "mint", "blush", "butter", "lilac", "sky"];
+      var mode = "dark";
+      var accent = "periwinkle";
       try {
         var p = JSON.parse(localStorage.getItem("suzume.theme") || "{}");
         if (p.mode === "light" || p.mode === "dark") mode = p.mode;
@@ -47,7 +47,7 @@
           <button class="theme-trigger" id="theme-trigger" type="button"
                   aria-haspopup="true" aria-expanded="false" aria-controls="theme-panel">
             <span class="theme-preview"></span>
-            <span id="theme-label">Indigo</span>
+            <span id="theme-label">Periwinkle</span>
             <svg class="chev" viewBox="0 0 16 16" fill="none" stroke="currentColor"
                  stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <path d="M4 6.5 8 10.5 12 6.5"/>
@@ -58,17 +58,17 @@
             <p class="theme-panel-label">Appearance</p>
             <div class="mode-switch" id="mode-switch">
               <button type="button" data-mode="light">Light</button>
-              <button type="button" data-mode="dark">Dark</button>
+              <button type="button" data-mode="dark" class="is-active">Dark</button>
             </div>
 
             <p class="theme-panel-label">Accent colour</p>
             <div class="swatches" id="swatches">
-              <button type="button" class="swatch" data-accent="indigo"   style="--sw:#4f46e5" title="Indigo"   aria-label="Indigo"></button>
-              <button type="button" class="swatch" data-accent="teal"     style="--sw:#0f766e" title="Teal"     aria-label="Teal"></button>
-              <button type="button" class="swatch" data-accent="vermilion" style="--sw:#d9482b" title="Vermilion" aria-label="Vermilion"></button>
-              <button type="button" class="swatch" data-accent="amber"    style="--sw:#b45309" title="Amber"    aria-label="Amber"></button>
-              <button type="button" class="swatch" data-accent="rose"     style="--sw:#be123c" title="Rose"     aria-label="Rose"></button>
-              <button type="button" class="swatch" data-accent="violet"   style="--sw:#7a6cf5" title="Violet"   aria-label="Violet"></button>
+              <button type="button" class="swatch" data-accent="periwinkle" style="--sw:#a3b8f5" title="Periwinkle" aria-label="Periwinkle"></button>
+              <button type="button" class="swatch" data-accent="mint"       style="--sw:#8ee0c8" title="Mint"       aria-label="Mint"></button>
+              <button type="button" class="swatch" data-accent="blush"      style="--sw:#f7a8b8" title="Blush"      aria-label="Blush"></button>
+              <button type="button" class="swatch" data-accent="butter"     style="--sw:#f5d08a" title="Butter"     aria-label="Butter"></button>
+              <button type="button" class="swatch" data-accent="lilac"      style="--sw:#cbb2f7" title="Lilac"      aria-label="Lilac"></button>
+              <button type="button" class="swatch" data-accent="sky"        style="--sw:#9ad4f0" title="Sky"        aria-label="Sky"></button>
             </div>
           </div>
         </div>
