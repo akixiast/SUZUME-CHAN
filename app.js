@@ -1,12 +1,109 @@
 /* suzume - daily anime draw challenge (vanilla JS, no build step) */
 
 const STORAGE_KEY = "suzume.gallery";
+const THEME_KEY = "suzume.theme";
 const HISTORY_LIMIT = 30;
-const CANVAS_BG = "#0e0f11"; // dark paper
-
-/* ---------------- helpers ---------------- */
 
 const $ = (id) => document.getElementById(id);
+
+/* ---------------- theme (light / dark + accent) ---------------- */
+
+const THEME_ACCENTS = {
+  indigo: "Indigo",
+  teal: "Teal",
+  vermilion: "Vermilion",
+  amber: "Amber",
+  rose: "Rose",
+  violet: "Violet",
+};
+
+const root = document.documentElement;
+let colorIsDefault = true; // true until the user picks their own ink
+let hasDrawn = false; // true once the canvas holds real artwork
+
+function cssVar(name) {
+  return getComputedStyle(root).getPropertyValue(name).trim();
+}
+
+function saveTheme() {
+  try {
+    localStorage.setItem(
+      THEME_KEY,
+      JSON.stringify({ mode: root.dataset.theme, accent: root.dataset.accent })
+    );
+  } catch {
+    /* storage blocked — theme just won't persist */
+  }
+}
+
+function applyTheme() {
+  const mode = root.dataset.theme;
+  const accent = root.dataset.accent;
+
+  $("theme-label").textContent = THEME_ACCENTS[accent] || "Theme";
+  document
+    .querySelectorAll("#mode-switch button")
+    .forEach((b) => b.classList.toggle("is-active", b.dataset.mode === mode));
+  document
+    .querySelectorAll("#swatches .swatch")
+    .forEach((b) => b.classList.toggle("is-active", b.dataset.accent === accent));
+
+  // keep the drawing surface in step with the theme
+  const nextBg = cssVar("--canvas-bg") || "#ffffff";
+  if (!hasDrawn) {
+    // pristine canvas — safe to repaint in the new theme colour
+    canvasBg = nextBg;
+    ctx.fillStyle = canvasBg;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  }
+  // while artwork exists, canvasBg stays pinned to the colour already on the
+  // canvas so the eraser keeps matching the background
+  if (colorIsDefault) {
+    color = cssVar("--ink") || "#1d2939";
+    $("color-input").value = color;
+  }
+}
+
+$("mode-switch").addEventListener("click", (e) => {
+  const btn = e.target.closest("button[data-mode]");
+  if (!btn) return;
+  root.dataset.theme = btn.dataset.mode;
+  saveTheme();
+  applyTheme();
+});
+
+$("swatches").addEventListener("click", (e) => {
+  const btn = e.target.closest(".swatch");
+  if (!btn) return;
+  root.dataset.accent = btn.dataset.accent;
+  saveTheme();
+  applyTheme();
+});
+
+/* dropdown open / close */
+const themeMenu = $("theme-menu");
+const themeTrigger = $("theme-trigger");
+
+function setThemeMenu(open) {
+  themeMenu.classList.toggle("is-open", open);
+  $("theme-panel").hidden = !open;
+  themeTrigger.setAttribute("aria-expanded", String(open));
+}
+
+themeTrigger.addEventListener("click", (e) => {
+  e.stopPropagation();
+  setThemeMenu(themeMenu.classList.contains("is-open") === false);
+});
+
+document.addEventListener("click", (e) => {
+  if (!themeMenu.contains(e.target)) setThemeMenu(false);
+});
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") setThemeMenu(false);
+});
+
+/* ---------------- helpers ---------------- */
 
 function todayKey(date = new Date()) {
   const y = date.getFullYear();
@@ -203,13 +300,16 @@ document
 const canvas = $("canvas");
 const ctx = canvas.getContext("2d");
 
-ctx.fillStyle = CANVAS_BG;
+let canvasBg = cssVar("--canvas-bg") || "#ffffff";
+
+ctx.fillStyle = canvasBg;
 ctx.fillRect(0, 0, canvas.width, canvas.height);
 ctx.lineCap = "round";
 ctx.lineJoin = "round";
 
 let tool = "pen";
-let color = "#f7f8f8";
+let color = cssVar("--ink") || "#1d2939";
+$("color-input").value = color;
 let size = 8;
 let drawing = false;
 let last = null;
@@ -224,7 +324,8 @@ function snapshot() {
 function restore(dataUrl) {
   const img = new Image();
   img.onload = () => {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = canvasBg;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
   };
   img.src = dataUrl;
@@ -240,6 +341,7 @@ function pos(e) {
 
 function startDraw(e) {
   drawing = true;
+  hasDrawn = true;
   last = pos(e);
   snapshot();
 }
@@ -247,7 +349,7 @@ function startDraw(e) {
 function moveDraw(e) {
   if (!drawing) return;
   const p = pos(e);
-  ctx.strokeStyle = tool === "eraser" ? CANVAS_BG : color;
+  ctx.strokeStyle = tool === "eraser" ? canvasBg : color;
   ctx.lineWidth = tool === "eraser" ? size * 2.5 : size;
   ctx.beginPath();
   ctx.moveTo(last.x, last.y);
@@ -283,6 +385,7 @@ $("eraser-btn").addEventListener("click", () => setTool("eraser"));
 
 $("color-input").addEventListener("input", (e) => {
   color = e.target.value;
+  colorIsDefault = false;
   if (tool === "eraser") setTool("pen");
 });
 
@@ -294,14 +397,16 @@ $("undo-btn").addEventListener("click", () => {
   history.pop();
   if (history.length) restore(history[history.length - 1]);
   else {
-    ctx.fillStyle = CANVAS_BG;
+    ctx.fillStyle = canvasBg;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
   }
   $("undo-btn").disabled = history.length === 0;
 });
 
 $("clear-btn").addEventListener("click", () => {
-  ctx.fillStyle = CANVAS_BG;
+  hasDrawn = false;
+  canvasBg = cssVar("--canvas-bg") || canvasBg;
+  ctx.fillStyle = canvasBg;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   history = [];
   $("undo-btn").disabled = true;
@@ -309,7 +414,7 @@ $("clear-btn").addEventListener("click", () => {
 });
 
 function canvasIsBlank() {
-  const [br, bg, bb] = hexToRgb(CANVAS_BG);
+  const [br, bg, bb] = hexToRgb(canvasBg);
   const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
   for (let i = 0; i < data.length; i += 41 * 4) {
     if (data[i] !== br || data[i + 1] !== bg || data[i + 2] !== bb) return false;
@@ -548,3 +653,6 @@ function renderGallery() {
 }
 
 renderGallery();
+
+/* sync UI controls with the theme applied on boot */
+applyTheme();

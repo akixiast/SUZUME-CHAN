@@ -8,9 +8,22 @@
   <link rel="stylesheet" href="style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400&family=Caveat:wght@500;600;700&family=Nunito+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600;700;800&family=Rubik+Mono+One&display=swap" rel="stylesheet">
+  <script>
+    /* apply saved theme before first paint to avoid a flash */
+    (function () {
+      var ACCENTS = ["indigo", "teal", "vermilion", "amber", "rose", "violet"];
+      var mode = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      var accent = "indigo";
+      try {
+        var p = JSON.parse(localStorage.getItem("suzume.theme") || "{}");
+        if (p.mode === "light" || p.mode === "dark") mode = p.mode;
+        if (ACCENTS.indexOf(p.accent) !== -1) accent = p.accent;
+      } catch (e) { /* storage blocked — fall back to defaults */ }
+      document.documentElement.dataset.theme = mode;
+      document.documentElement.dataset.accent = accent;
+    })();
+  </script>
 </head>
 <body>
   <header class="topbar">
@@ -28,6 +41,38 @@
         <button class="nav-btn" data-section="gallery">Gallery</button>
         <button class="nav-btn" data-section="explore">Explore</button>
       </nav>
+
+      <div class="topbar-right">
+        <div class="theme-menu" id="theme-menu">
+          <button class="theme-trigger" id="theme-trigger" type="button"
+                  aria-haspopup="true" aria-expanded="false" aria-controls="theme-panel">
+            <span class="theme-preview"></span>
+            <span id="theme-label">Indigo</span>
+            <svg class="chev" viewBox="0 0 16 16" fill="none" stroke="currentColor"
+                 stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M4 6.5 8 10.5 12 6.5"/>
+            </svg>
+          </button>
+
+          <div class="theme-panel" id="theme-panel" hidden>
+            <p class="theme-panel-label">Appearance</p>
+            <div class="mode-switch" id="mode-switch">
+              <button type="button" data-mode="light">Light</button>
+              <button type="button" data-mode="dark">Dark</button>
+            </div>
+
+            <p class="theme-panel-label">Accent colour</p>
+            <div class="swatches" id="swatches">
+              <button type="button" class="swatch" data-accent="indigo"   style="--sw:#4f46e5" title="Indigo"   aria-label="Indigo"></button>
+              <button type="button" class="swatch" data-accent="teal"     style="--sw:#0f766e" title="Teal"     aria-label="Teal"></button>
+              <button type="button" class="swatch" data-accent="vermilion" style="--sw:#d9482b" title="Vermilion" aria-label="Vermilion"></button>
+              <button type="button" class="swatch" data-accent="amber"    style="--sw:#b45309" title="Amber"    aria-label="Amber"></button>
+              <button type="button" class="swatch" data-accent="rose"     style="--sw:#be123c" title="Rose"     aria-label="Rose"></button>
+              <button type="button" class="swatch" data-accent="violet"   style="--sw:#7a6cf5" title="Violet"   aria-label="Violet"></button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </header>
 
